@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  token       String    @unique
+  companyName String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  founders    Founder[]
+
+  @@map("api_keys")
+}
+
+model Founder {
+  id          String      @id @default(cuid())
+  name        String
+  email       String      @unique
+  apiKeyId    String
+  apiKey      ApiKey      @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  moodEntries MoodEntry[]
+
+  @@map("founders")
+}
+
+model MoodEntry {
+  id          String   @id @default(cuid())
+  founderId   String
+  founder     Founder  @relation(fields: [founderId], references: [id], onDelete: Cascade)
+  mood        Int      // 0-5: 0=Terrible, 1=Bad, 2=Meh, 3=Okay, 4=Good, 5=Excellent
+  timeOfDay   String   // "morning" or "afternoon"
+  emailSentAt DateTime
+  respondedAt DateTime?
+  rawResponse String?  // Store the raw email response
+  createdAt   DateTime @default(now())
+
+  @@map("mood_entries")
+}
