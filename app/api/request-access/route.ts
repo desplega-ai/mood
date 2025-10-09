@@ -33,11 +33,17 @@ export async function POST(request: NextRequest) {
     // Generate a unique API token
     const token = `mood-${crypto.randomBytes(16).toString("hex")}`;
 
-    // Create API key in database
+    // Create API key and founder in database
     const apiKey = await prisma.apiKey.create({
       data: {
         token,
         companyName,
+        founders: {
+          create: {
+            name,
+            email,
+          },
+        },
       },
     });
 
