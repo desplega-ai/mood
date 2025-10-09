@@ -17,8 +17,8 @@ export async function processEmailReplies() {
     const results: any[] = [];
 
     function openInbox(cb: (err: Error | null, box?: any) => void) {
-      // Use All Mail to catch archived emails
-      imap.openBox("[Gmail]/All Mail", false, cb);
+      // Use INBOX - works across all Gmail locales
+      imap.openBox("INBOX", false, cb);
     }
 
     imap.once("ready", () => {

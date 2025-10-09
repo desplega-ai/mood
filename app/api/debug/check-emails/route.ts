@@ -14,7 +14,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
 
     function openInbox(cb: (err: Error | null, box?: any) => void) {
-      imap.openBox("[Gmail]/All Mail", false, cb);
+      imap.openBox("INBOX", false, cb);
     }
 
     imap.once("ready", () => {

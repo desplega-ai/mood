@@ -344,14 +344,15 @@ Just reply to this email with how you're doing.
 
 ### Email Replies Not Being Processed
 
-1. Check if Gmail automatically archives emails - IMAP searches `[Gmail]/All Mail`
-2. Verify email subject contains `[MoodCheck]` tag
-3. Check dev server logs for IMAP connection errors
-4. Manually trigger the processing:
+1. **Keep replies in INBOX**: The system searches INBOX for emails from the last 24 hours. Since processing runs every 5 minutes, replies need to stay in INBOX for up to 5 minutes. After processing, you can archive them.
+2. **If you archive immediately**: Manually trigger processing right after replying:
    ```bash
    curl -X GET http://localhost:3002/api/cron/process-email-replies \
      -H "Authorization: Bearer your_random_secret_here"
    ```
+3. Verify email subject contains `[MoodCheck-{entryId}]` tag
+4. Check dev server logs for IMAP connection errors
+5. Check that the founder email exists in the database
 
 ### Dashboard Not Showing Data
 
@@ -372,8 +373,10 @@ Just reply to this email with how you're doing.
 
 ## Architecture Notes
 
-- **Email Processing**: Uses Gmail IMAP to poll for replies instead of webhooks (works with auto-archiving)
-- **AI Categorization**: Uses GPT-4o-mini with low reasoning effort for fast, cost-effective analysis
+- **Email Processing**: Uses Gmail IMAP to poll INBOX for replies every 5 minutes (searches last 24 hours)
+- **Entry ID Tracking**: Each email includes a unique entry ID in the subject for precise database matching
+- **Database as Source of Truth**: Only processes emails with pending entries (`respondedAt: null`)
+- **AI Categorization**: Uses GPT-4o-mini for fast, cost-effective sentiment analysis
 - **Database**: Prisma generates client to `app/generated/prisma` to avoid conflicts
 - **Mood Storage**: Stores both the AI-categorized score (0-5) AND the exact email text
 - **Auto-refresh**: Dashboard uses `setInterval` to fetch new data every 30 seconds
