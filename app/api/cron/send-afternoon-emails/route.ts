@@ -21,11 +21,8 @@ export async function GET(request: NextRequest) {
 
     for (const founder of founders) {
       try {
-        // Send afternoon email
-        await sendMoodCheckEmail(founder.email, founder.name, "afternoon");
-
-        // Create a mood entry to track that email was sent
-        await prisma.moodEntry.create({
+        // Create a mood entry first to get the ID
+        const moodEntry = await prisma.moodEntry.create({
           data: {
             founderId: founder.id,
             mood: 3, // Default placeholder, will be updated when response is received
@@ -33,6 +30,9 @@ export async function GET(request: NextRequest) {
             emailSentAt: new Date(),
           },
         });
+
+        // Send afternoon email with entry ID in subject
+        await sendMoodCheckEmail(founder.email, founder.name, "afternoon", moodEntry.id);
 
         results.push({
           email: founder.email,

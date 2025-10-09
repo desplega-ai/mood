@@ -33,18 +33,31 @@ pnpm install
 
 ### 2. Set Up Gmail
 
-#### Enable 2-Factor Authentication
-1. Go to your Google Account settings
-2. Enable 2-Factor Authentication if not already enabled
+#### Step 1: Enable 2-Factor Authentication
+1. Go to [Google Account Security](https://myaccount.google.com/security)
+2. Under "How you sign in to Google", click on **2-Step Verification**
+3. Follow the steps to enable 2FA if not already enabled (required for app passwords)
 
-#### Create App Password
-1. Go to https://myaccount.google.com/apppasswords
-2. Create a new app password for "Mail"
-3. Save the 16-character password (format: `xxxx xxxx xxxx xxxx`)
+#### Step 2: Create App Password
+1. Go to [Google App Passwords](https://myaccount.google.com/apppasswords)
+   - **Note**: You must have 2FA enabled first, otherwise this page won't be available
+2. You may need to sign in again
+3. At the bottom, under "App passwords":
+   - Select app: Choose **Mail**
+   - Select device: Choose **Other (Custom name)**
+   - Enter a name like "Mood Tracker"
+   - Click **Generate**
+4. Google will show you a 16-character password (format: `xxxx xxxx xxxx xxxx`)
+5. **Copy this password immediately** - you won't be able to see it again
+6. Use this password (without spaces) as your `GMAIL_APP_PASSWORD` in `.env`
 
-#### Enable IMAP
-1. Go to Gmail Settings → Forwarding and POP/IMAP
-2. Enable IMAP access
+**Important**: Use the app password, NOT your regular Gmail password!
+
+#### Step 3: Enable IMAP
+1. Go to [Gmail Settings](https://mail.google.com/mail/u/0/#settings/fwdandpop)
+2. Click on **Forwarding and POP/IMAP** tab
+3. Under "IMAP access", select **Enable IMAP**
+4. Click **Save Changes** at the bottom
 
 ### 3. Set Up Database
 

@@ -17,15 +17,18 @@ const transporter = nodemailer.createTransport({
 export async function sendMoodCheckEmail(
   to: string,
   founderName: string,
-  timeOfDay: "morning" | "afternoon"
+  timeOfDay: "morning" | "afternoon",
+  entryId: string
 ) {
   const subject = timeOfDay === "morning"
-    ? "[MoodCheck] How are you feeling this morning?"
-    : "[MoodCheck] How was your day?";
+    ? `[MoodCheck-${entryId}] How are you feeling this morning?`
+    : `[MoodCheck-${entryId}] How was your day?`;
+
+  const dashboardUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
 
   const message = timeOfDay === "morning"
-    ? `Hi ${founderName},\n\nHow are you feeling today?\n\nJust reply to this email with how you're doing.`
-    : `Hi ${founderName},\n\nHow was your day?\n\nJust reply to this email with how you're doing.`;
+    ? `Hi ${founderName},\n\nHow are you feeling today?\n\nJust reply to this email with how you're doing.\n\nView your mood dashboard: ${dashboardUrl}`
+    : `Hi ${founderName},\n\nHow was your day?\n\nJust reply to this email with how you're doing.\n\nView your mood dashboard: ${dashboardUrl}`;
 
   try {
     const info = await transporter.sendMail({

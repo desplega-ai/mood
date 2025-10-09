@@ -71,31 +71,37 @@ export async function processEmailReplies() {
                       return;
                     }
 
-                    console.log(`Processing email from: ${fromEmail}`);
+                    // Extract entry ID from subject: [MoodCheck-{entryId}] ...
+                    const subject = parsed.subject || "";
+                    const entryIdMatch = subject.match(/\[MoodCheck-([^\]]+)\]/);
 
-                    // Find the founder
-                    const founder = await prisma.founder.findUnique({
-                      where: { email: fromEmail },
-                    });
-
-                    if (!founder) {
-                      console.log(`Unknown sender: ${fromEmail}`);
+                    if (!entryIdMatch) {
+                      console.log(`No entry ID found in subject: ${subject}`);
                       return;
                     }
 
-                    // Get the most recent unresponded mood entry
+                    const entryId = entryIdMatch[1];
+                    console.log(`Processing email from: ${fromEmail} for entry: ${entryId}`);
+
+                    // Find the specific mood entry by ID
                     const moodEntry = await prisma.moodEntry.findFirst({
                       where: {
-                        founderId: founder.id,
-                        respondedAt: null,
+                        id: entryId,
+                        respondedAt: null, // Only process if not already responded
                       },
-                      orderBy: {
-                        emailSentAt: "desc",
+                      include: {
+                        founder: true,
                       },
                     });
 
                     if (!moodEntry) {
-                      console.log(`No pending mood entry for ${fromEmail}`);
+                      console.log(`Mood entry ${entryId} not found or already processed`);
+                      return;
+                    }
+
+                    // Verify the email is from the correct founder
+                    if (moodEntry.founder.email !== fromEmail) {
+                      console.log(`Email from ${fromEmail} doesn't match entry founder ${moodEntry.founder.email}`);
                       return;
                     }
 
@@ -115,9 +121,9 @@ export async function processEmailReplies() {
                       },
                     });
 
-                    console.log(`✅ Updated mood for ${founder.name}: ${moodScore}`);
+                    console.log(`✅ Updated mood for ${moodEntry.founder.name}: ${moodScore}`);
                     processedEmails.push({
-                      founder: founder.name,
+                      founder: moodEntry.founder.name,
                       email: fromEmail,
                       mood: moodScore,
                     });
