@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Imap from "imap";
 
-export async function GET(request: NextRequest) {
-  return new Promise((resolve) => {
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  return new Promise<NextResponse>((resolve) => {
     const imap = new Imap({
       user: process.env.GMAIL_USER!,
       password: process.env.GMAIL_APP_PASSWORD!,

@@ -336,7 +336,7 @@ export default function Dashboard() {
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h3 className="text-xl font-bold text-gray-800">
-                  {selectedEntry.founder.name}'s Response
+                  {selectedEntry.founder.name}&apos;s Response
                 </h3>
                 <p className="text-sm text-gray-600">
                   {new Date(selectedEntry.createdAt).toLocaleString("es-ES")} -{" "}

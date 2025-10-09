@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Imap from "imap";
 import { simpleParser } from "mailparser";
 
-export async function GET(request: NextRequest) {
-  return new Promise((resolve) => {
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  return new Promise<NextResponse>((resolve) => {
     const imap = new Imap({
       user: process.env.GMAIL_USER!,
       password: process.env.GMAIL_APP_PASSWORD!,
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 
           fetch.on("message", (msg, seqno) => {
             msg.on("body", (stream) => {
-              simpleParser(stream, async (err, parsed) => {
+              simpleParser(stream as any, async (err, parsed) => {
                 if (err) {
                   console.error("Error parsing email:", err);
                   return;
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
                 emails.push({
                   seqno,
                   from: parsed.from?.text,
-                  to: parsed.to?.text,
+                  to: Array.isArray(parsed.to) ? parsed.to[0]?.text : parsed.to?.text,
                   subject: parsed.subject,
                   date: parsed.date,
                 });

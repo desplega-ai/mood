@@ -24,11 +24,6 @@ The response might be in Spanish or English. Analyze the sentiment, tone, and co
 Email response: "${emailResponse}"
 
 Respond ONLY with a single number from 0 to 5. Nothing else.`,
-      experimental_providerMetadata: {
-        openrouter: {
-          reasoning_effort: "low",
-        },
-      },
     });
 
     const mood = parseInt(text.trim(), 10);

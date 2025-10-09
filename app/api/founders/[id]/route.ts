@@ -4,9 +4,10 @@ import { prisma } from "@/lib/prisma";
 // Delete a founder
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const token = request.headers.get("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
@@ -24,7 +25,7 @@ export async function DELETE(
     // Verify the founder belongs to this API key
     const founder = await prisma.founder.findFirst({
       where: {
-        id: params.id,
+        id,
         apiKeyId: apiKey.id,
       },
     });
@@ -34,7 +35,7 @@ export async function DELETE(
     }
 
     await prisma.founder.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });
@@ -47,9 +48,10 @@ export async function DELETE(
 // Update a founder
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const token = request.headers.get("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
@@ -69,7 +71,7 @@ export async function PATCH(
     // Verify the founder belongs to this API key
     const founder = await prisma.founder.findFirst({
       where: {
-        id: params.id,
+        id,
         apiKeyId: apiKey.id,
       },
     });
@@ -79,7 +81,7 @@ export async function PATCH(
     }
 
     const updatedFounder = await prisma.founder.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name && { name }),
         ...(email && { email }),

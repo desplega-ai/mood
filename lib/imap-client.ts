@@ -53,7 +53,7 @@ export async function processEmailReplies() {
 
             fetch.on("message", (msg) => {
               msg.on("body", (stream) => {
-                simpleParser(stream, async (err, parsed) => {
+                simpleParser(stream as any, async (err, parsed) => {
                   if (err) {
                     console.error("Error parsing email:", err);
                     return;
