@@ -18,21 +18,28 @@ export async function sendMoodCheckEmail(
   to: string,
   founderName: string,
   timeOfDay: "morning" | "afternoon",
-  entryId: string
+  entryId: string,
+  motivationalQuote?: string
 ) {
-  const subject = timeOfDay === "morning"
-    ? `[MoodCheck-${entryId}] How are you feeling this morning?`
-    : `[MoodCheck-${entryId}] How was your day?`;
+  const subject =
+    timeOfDay === "morning"
+      ? `[MoodCheck-${entryId}] How are you feeling this morning?`
+      : `[MoodCheck-${entryId}] How was your day?`;
 
   const dashboardUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002";
 
-  const message = timeOfDay === "morning"
-    ? `Hi ${founderName},\n\nHow are you feeling today?\n\nJust reply to this email with how you're doing.\n\nView your mood dashboard: ${dashboardUrl}`
-    : `Hi ${founderName},\n\nHow was your day?\n\nJust reply to this email with how you're doing.\n\nView your mood dashboard: ${dashboardUrl}`;
+  const greeting =
+    timeOfDay === "morning"
+      ? `Hi ${founderName},\n\nHow are you feeling today?`
+      : `Hi ${founderName},\n\nHow was your day?`;
+
+  const quoteSection = motivationalQuote ? `\n\n${motivationalQuote}\n` : "\n";
+
+  const message = `${greeting}${quoteSection}\nJust reply to this email with how you're doing.\n\nView your mood dashboard: ${dashboardUrl}`;
 
   try {
     const info = await transporter.sendMail({
-      from: `"Mood Tracker" <t@desplega.ai>`,
+      from: `"Mood Tracker" <${process.env.GMAIL_USER}>`,
       to,
       subject,
       text: message,

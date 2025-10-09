@@ -7,10 +7,7 @@ export async function POST(request: NextRequest) {
     const { email, moodText } = await request.json();
 
     if (!email || !moodText) {
-      return NextResponse.json(
-        { error: "email and moodText are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "email and moodText are required" }, { status: 400 });
     }
 
     // Find the founder
@@ -34,10 +31,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!moodEntry) {
-      return NextResponse.json(
-        { error: "No pending mood entry found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "No pending mood entry found" }, { status: 404 });
     }
 
     // Categorize mood
@@ -64,7 +58,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error processing mood:", error);
     return NextResponse.json(
-      { error: "Internal server error", details: error instanceof Error ? error.message : "Unknown" },
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : "Unknown",
+      },
       { status: 500 }
     );
   }

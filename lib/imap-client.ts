@@ -101,7 +101,9 @@ export async function processEmailReplies() {
 
                     // Verify the email is from the correct founder
                     if (moodEntry.founder.email !== fromEmail) {
-                      console.log(`Email from ${fromEmail} doesn't match entry founder ${moodEntry.founder.email}`);
+                      console.log(
+                        `Email from ${fromEmail} doesn't match entry founder ${moodEntry.founder.email}`
+                      );
                       return;
                     }
 

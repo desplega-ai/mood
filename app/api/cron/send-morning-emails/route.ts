@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendMoodCheckEmail } from "@/lib/gmail";
+import { generateMotivationalQuote } from "@/lib/ai";
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,34 +32,34 @@ export async function GET(request: NextRequest) {
           },
         });
 
-        // Send morning email with entry ID in subject
-        await sendMoodCheckEmail(founder.email, founder.name, "morning", moodEntry.id);
+        // Generate motivational quote
+        const quote = await generateMotivationalQuote("morning");
+
+        // Send morning email with entry ID in subject and motivational quote
+        await sendMoodCheckEmail(founder.email, founder.name, "morning", moodEntry.id, quote);
 
         results.push({
           email: founder.email,
-          status: "sent"
+          status: "sent",
         });
       } catch (error) {
         console.error(`Failed to send email to ${founder.email}:`, error);
         results.push({
           email: founder.email,
           status: "failed",
-          error: error instanceof Error ? error.message : "Unknown error"
+          error: error instanceof Error ? error.message : "Unknown error",
         });
       }
     }
 
     return NextResponse.json({
       success: true,
-      sent: results.filter(r => r.status === "sent").length,
-      failed: results.filter(r => r.status === "failed").length,
+      sent: results.filter((r) => r.status === "sent").length,
+      failed: results.filter((r) => r.status === "failed").length,
       results,
     });
   } catch (error) {
     console.error("Cron job error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

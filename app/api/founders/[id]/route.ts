@@ -46,10 +46,7 @@ export async function DELETE(
 }
 
 // Update a founder
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const token = request.headers.get("Authorization")?.replace("Bearer ", "");

@@ -5,6 +5,41 @@ const openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
+export async function generateMotivationalQuote(
+  timeOfDay: "morning" | "afternoon"
+): Promise<string> {
+  try {
+    const { text } = await generateText({
+      model: openrouter("openai/gpt-4o-mini"),
+      prompt: `Generate a SHORT (max 15 words), funny, fake motivational quote for a startup founder.
+
+Time of day: ${timeOfDay}
+${
+  timeOfDay === "morning"
+    ? "Make it about starting the day, energy, or morning motivation."
+    : "Make it about finishing the day, reflecting, or evening wisdom."
+}
+
+The quote should be attributed to a famous person (real or fictional) but the quote itself should be completely made up and slightly absurd/humorous while still being motivational.
+
+Format: "Quote text" - Famous Person
+
+Example (morning): "Coffee first, unicorns later." - Elon Musk
+Example (afternoon): "The best code is written after 9 PM." - Steve Jobs
+
+Generate ONE quote only.`,
+    });
+
+    return text.trim();
+  } catch (error) {
+    console.error("Error generating quote:", error);
+    // Fallback quotes
+    return timeOfDay === "morning"
+      ? '"Ship fast, debug faster." - Mark Zuckerberg'
+      : '"Sleep is for the funded." - Paul Graham';
+  }
+}
+
 export async function categorizeMood(emailResponse: string): Promise<number> {
   try {
     const { text } = await generateText({

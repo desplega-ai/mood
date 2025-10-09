@@ -50,10 +50,7 @@ export async function POST(request: NextRequest) {
     const { name, email } = await request.json();
 
     if (!name || !email) {
-      return NextResponse.json(
-        { error: "Name and email are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
     }
 
     // Check if email already exists
@@ -62,10 +59,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingFounder) {
-      return NextResponse.json(
-        { error: "Email already exists" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "Email already exists" }, { status: 409 });
     }
 
     const founder = await prisma.founder.create({

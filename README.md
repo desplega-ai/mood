@@ -34,11 +34,13 @@ pnpm install
 ### 2. Set Up Gmail
 
 #### Step 1: Enable 2-Factor Authentication
+
 1. Go to [Google Account Security](https://myaccount.google.com/security)
 2. Under "How you sign in to Google", click on **2-Step Verification**
 3. Follow the steps to enable 2FA if not already enabled (required for app passwords)
 
 #### Step 2: Create App Password
+
 1. Go to [Google App Passwords](https://myaccount.google.com/apppasswords)
    - **Note**: You must have 2FA enabled first, otherwise this page won't be available
 2. You may need to sign in again
@@ -54,6 +56,7 @@ pnpm install
 **Important**: Use the app password, NOT your regular Gmail password!
 
 #### Step 3: Enable IMAP
+
 1. Go to [Gmail Settings](https://mail.google.com/mail/u/0/#settings/fwdandpop)
 2. Click on **Forwarding and POP/IMAP** tab
 3. Under "IMAP access", select **Enable IMAP**
@@ -101,6 +104,7 @@ pnpm prisma db seed
 ```
 
 This creates:
+
 - **API Token**: `desplega-dev-token-12345`
 - **Company**: desplega.ai
 - **Founder**: Taras (t@desplega.ai)
@@ -246,6 +250,7 @@ curl -X GET https://your-app.vercel.app/api/cron/process-email-replies \
 Founders receive simple, plain-text emails:
 
 **Morning** (6 AM):
+
 ```
 Hi [Name],
 
@@ -255,6 +260,7 @@ Just reply to this email with how you're doing.
 ```
 
 **Afternoon** (10 PM):
+
 ```
 Hi [Name],
 
@@ -284,37 +290,45 @@ Just reply to this email with how you're doing.
 ## API Routes
 
 ### Authentication
+
 - `POST /api/auth/validate` - Validate API token
 
 ### Founders Management
+
 - `GET /api/founders` - Get all founders (requires auth)
 - `POST /api/founders` - Create a founder (requires auth)
 - `DELETE /api/founders/[id]` - Delete a founder (requires auth)
 - `PATCH /api/founders/[id]` - Update a founder (requires auth)
 
 ### Mood Data
+
 - `GET /api/mood?period=all|weekly|monthly` - Get mood entries (requires auth)
 
 ### Cron Jobs (Protected by CRON_SECRET)
+
 - `GET /api/cron/send-morning-emails` - Send morning emails to all founders
 - `GET /api/cron/send-afternoon-emails` - Send afternoon emails to all founders
 - `GET /api/cron/process-email-replies` - Poll Gmail IMAP and process replies
 
 ### Testing
+
 - `POST /api/test/process-mood` - Manually process a mood entry (dev only)
 
 ### Debugging
+
 - `GET /api/debug/check-emails` - Check Gmail for unread emails (dev only)
 
 ## Database Schema
 
 ### ApiKey
+
 - `id`: Unique identifier
 - `token`: API token for authentication
 - `companyName`: Company name
 - `founders`: Related founders
 
 ### Founder
+
 - `id`: Unique identifier
 - `name`: Founder name
 - `email`: Founder email (unique)
@@ -322,6 +336,7 @@ Just reply to this email with how you're doing.
 - `moodEntries`: Related mood entries
 
 ### MoodEntry
+
 - `id`: Unique identifier
 - `founderId`: Reference to founder
 - `mood`: Mood score (0-5)

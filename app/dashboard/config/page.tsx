@@ -27,6 +27,7 @@ export default function ConfigPage() {
     }
     setToken(storedToken);
     fetchFounders(storedToken);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchFounders = async (token: string) => {
@@ -110,12 +111,8 @@ export default function ConfigPage() {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
-                Configure Founders
-              </h1>
-              <p className="text-gray-600">
-                Manage founders who will receive mood check emails
-              </p>
+              <h1 className="text-3xl font-bold text-gray-800">Configure Founders</h1>
+              <p className="text-gray-600">Manage founders who will receive mood check emails</p>
             </div>
             <button
               onClick={() => router.push("/dashboard")}
@@ -132,26 +129,20 @@ export default function ConfigPage() {
           )}
 
           <div className="bg-gray-50 p-6 rounded-lg mb-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Add New Founder
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Add New Founder</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 type="text"
                 placeholder="Name"
                 value={newFounder.name}
-                onChange={(e) =>
-                  setNewFounder({ ...newFounder, name: e.target.value })
-                }
+                onChange={(e) => setNewFounder({ ...newFounder, name: e.target.value })}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="email"
                 placeholder="Email"
                 value={newFounder.email}
-                onChange={(e) =>
-                  setNewFounder({ ...newFounder, email: e.target.value })
-                }
+                onChange={(e) => setNewFounder({ ...newFounder, email: e.target.value })}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
@@ -185,13 +176,10 @@ export default function ConfigPage() {
                     className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <div>
-                      <p className="font-medium text-gray-800">
-                        {founder.name}
-                      </p>
+                      <p className="font-medium text-gray-800">{founder.name}</p>
                       <p className="text-sm text-gray-600">{founder.email}</p>
                       <p className="text-xs text-gray-500">
-                        Added:{" "}
-                        {new Date(founder.createdAt).toLocaleDateString("es-ES")}
+                        Added: {new Date(founder.createdAt).toLocaleDateString("es-ES")}
                       </p>
                     </div>
                     <button
@@ -207,15 +195,11 @@ export default function ConfigPage() {
           </div>
 
           <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">
-              Email Schedule
-            </h3>
+            <h3 className="font-semibold text-gray-800 mb-2">Email Schedule</h3>
             <ul className="text-sm text-gray-600 space-y-1">
               <li>• Morning emails: 6:00 AM (Spanish time)</li>
               <li>• Afternoon emails: 10:00 PM (Spanish time)</li>
-              <li>
-                • Founders will receive mood check emails at these times daily
-              </li>
+              <li>• Founders will receive mood check emails at these times daily</li>
             </ul>
           </div>
         </div>

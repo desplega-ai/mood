@@ -53,6 +53,7 @@ export default function Dashboard() {
     }, 30000);
 
     return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period]);
 
   const validateToken = async (token: string) => {
@@ -121,16 +122,12 @@ export default function Dashboard() {
 
   const averageMoodNum =
     moodData.filter((e) => e.respondedAt).length > 0
-      ? moodData
-          .filter((e) => e.respondedAt)
-          .reduce((sum, e) => sum + e.mood, 0) /
+      ? moodData.filter((e) => e.respondedAt).reduce((sum, e) => sum + e.mood, 0) /
         moodData.filter((e) => e.respondedAt).length
       : 0;
 
   const averageMoodLabel =
-    averageMoodNum > 0
-      ? getMoodLabel(Math.round(averageMoodNum) as any)
-      : "N/A";
+    averageMoodNum > 0 ? getMoodLabel(Math.round(averageMoodNum) as any) : "N/A";
   const averageMood = averageMoodNum > 0 ? averageMoodNum.toFixed(1) : "N/A";
 
   return (
@@ -139,9 +136,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
-                {companyName || "Mood Tracker"}
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-800">{companyName || "Mood Tracker"}</h1>
               <p className="text-gray-600">Track founder mood over time</p>
             </div>
             <div className="flex gap-4">
@@ -223,7 +218,10 @@ export default function Dashboard() {
 
               {formatChartData().length > 0 ? (
                 <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={formatChartData()} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                  <LineChart
+                    data={formatChartData()}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis
@@ -238,16 +236,9 @@ export default function Dashboard() {
                           return (
                             <div className="bg-white p-4 rounded-lg shadow-lg border">
                               <p className="font-semibold">{data.founder}</p>
-                              <p className="text-sm text-gray-600">
-                                {data.date}
-                              </p>
-                              <p className="text-sm">
-                                Time: {data.timeOfDay}
-                              </p>
-                              <p
-                                className="font-bold"
-                                style={{ color: getMoodColor(data.mood) }}
-                              >
+                              <p className="text-sm text-gray-600">{data.date}</p>
+                              <p className="text-sm">Time: {data.timeOfDay}</p>
+                              <p className="font-bold" style={{ color: getMoodColor(data.mood) }}>
                                 Mood: {data.label}
                               </p>
                             </div>
@@ -274,25 +265,22 @@ export default function Dashboard() {
               )}
 
               <div className="mt-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                  Recent Entries
-                </h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Entries</h3>
                 <div className="space-y-2">
                   {moodData.slice(0, 10).map((entry) => (
                     <div
                       key={entry.id}
                       onClick={() => entry.respondedAt && setSelectedEntry(entry)}
                       className={`flex justify-between items-center p-4 bg-gray-50 rounded-lg ${
-                        entry.respondedAt ? "cursor-pointer hover:bg-gray-100 transition-colors" : ""
+                        entry.respondedAt
+                          ? "cursor-pointer hover:bg-gray-100 transition-colors"
+                          : ""
                       }`}
                     >
                       <div>
-                        <p className="font-medium text-gray-800">
-                          {entry.founder.name}
-                        </p>
+                        <p className="font-medium text-gray-800">{entry.founder.name}</p>
                         <p className="text-sm text-gray-600">
-                          {new Date(entry.createdAt).toLocaleString("es-ES")} -{" "}
-                          {entry.timeOfDay}
+                          {new Date(entry.createdAt).toLocaleString("es-ES")} - {entry.timeOfDay}
                         </p>
                       </div>
                       <div className="text-right">
@@ -304,14 +292,10 @@ export default function Dashboard() {
                             >
                               {getMoodLabel(entry.mood as any)}
                             </p>
-                            <p className="text-sm text-gray-600">
-                              Click to view reply
-                            </p>
+                            <p className="text-sm text-gray-600">Click to view reply</p>
                           </>
                         ) : (
-                          <p className="text-sm text-gray-500">
-                            Pending response
-                          </p>
+                          <p className="text-sm text-gray-500">Pending response</p>
                         )}
                       </div>
                     </div>

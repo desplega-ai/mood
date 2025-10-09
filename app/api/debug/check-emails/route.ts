@@ -38,11 +38,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
           if (!results || results.length === 0) {
             imap.end();
-            resolve(NextResponse.json({
-              message: "No unread emails found",
-              total: box.messages.total,
-              unseen: box.messages.unseen
-            }));
+            resolve(
+              NextResponse.json({
+                message: "No unread emails found",
+                total: box.messages.total,
+                unseen: box.messages.unseen,
+              })
+            );
             return;
           }
 
@@ -78,14 +80,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             console.log("Done fetching");
             imap.end();
             setTimeout(() => {
-              resolve(NextResponse.json({
-                found: emails.length,
-                emails,
-                boxInfo: {
-                  total: box.messages.total,
-                  unseen: box.messages.unseen
-                }
-              }));
+              resolve(
+                NextResponse.json({
+                  found: emails.length,
+                  emails,
+                  boxInfo: {
+                    total: box.messages.total,
+                    unseen: box.messages.unseen,
+                  },
+                })
+              );
             }, 500);
           });
         });
