@@ -28,10 +28,14 @@ export async function processEmailReplies() {
           return;
         }
 
-        // Search for unread emails with MoodCheck in subject
+        // Search for emails from the last 24 hours with MoodCheck in subject
+        // We'll check the database to see if they've been processed
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
         imap.search(
           [
-            "UNSEEN",
+            ["SINCE", yesterday],
             ["HEADER", "SUBJECT", "MoodCheck"],
           ],
           (err, results) => {
@@ -42,13 +46,14 @@ export async function processEmailReplies() {
             }
 
             if (!results || results.length === 0) {
-              console.log("No unread emails found");
+              console.log("No MoodCheck emails found");
               imap.end();
               resolve([]);
               return;
             }
 
-            const fetch = imap.fetch(results, { bodies: "", markSeen: true });
+            console.log(`Found ${results.length} MoodCheck emails`);
+            const fetch = imap.fetch(results, { bodies: "", markSeen: false });
             const processedEmails: any[] = [];
 
             fetch.on("message", (msg) => {
