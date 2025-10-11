@@ -1,7 +1,7 @@
 import Imap from "imap";
 import { simpleParser } from "mailparser";
 import { prisma } from "@/lib/prisma";
-import { categorizeMood } from "@/lib/ai";
+import { categorizeDualMood } from "@/lib/ai";
 
 export async function processEmailReplies() {
   return new Promise((resolve, reject) => {
@@ -110,24 +110,28 @@ export async function processEmailReplies() {
                     // Get email content
                     const emailText = parsed.text || parsed.html || "";
 
-                    // Categorize mood
-                    const moodScore = await categorizeMood(emailText);
+                    // Categorize both moods (yesterday and today)
+                    const moods = await categorizeDualMood(emailText);
 
                     // Update mood entry
                     await prisma.moodEntry.update({
                       where: { id: moodEntry.id },
                       data: {
-                        mood: moodScore,
+                        moodYesterday: moods.yesterday,
+                        moodToday: moods.today,
                         rawResponse: emailText,
                         respondedAt: new Date(),
                       },
                     });
 
-                    console.log(`✅ Updated mood for ${moodEntry.founder.name}: ${moodScore}`);
+                    console.log(
+                      `✅ Updated mood for ${moodEntry.founder.name}: Yesterday=${moods.yesterday}, Today=${moods.today}`
+                    );
                     processedEmails.push({
                       founder: moodEntry.founder.name,
                       email: fromEmail,
-                      mood: moodScore,
+                      moodYesterday: moods.yesterday,
+                      moodToday: moods.today,
                     });
                   } catch (error) {
                     console.error("Error processing email:", error);

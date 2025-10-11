@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { categorizeMood } from "@/lib/ai";
+import { categorizeDualMood } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,14 +34,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No pending mood entry found" }, { status: 404 });
     }
 
-    // Categorize mood
-    const moodScore = await categorizeMood(moodText);
+    // Categorize both moods (yesterday and today)
+    const moods = await categorizeDualMood(moodText);
 
     // Update mood entry
     const updated = await prisma.moodEntry.update({
       where: { id: moodEntry.id },
       data: {
-        mood: moodScore,
+        moodYesterday: moods.yesterday,
+        moodToday: moods.today,
         rawResponse: moodText,
         respondedAt: new Date(),
       },
@@ -50,8 +51,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       founder: founder.name,
-      moodScore,
-      moodLabel: getMoodLabel(moodScore),
+      moodYesterday: moods.yesterday,
+      moodToday: moods.today,
+      moodLabelYesterday: getMoodLabel(moods.yesterday),
+      moodLabelToday: getMoodLabel(moods.today),
       rawResponse: moodText,
       updated,
     });

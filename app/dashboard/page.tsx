@@ -16,8 +16,8 @@ import { getMoodLabel, getMoodColor } from "@/lib/mood-labels";
 
 type MoodEntry = {
   id: string;
-  mood: number;
-  timeOfDay: string;
+  moodYesterday: number | null;
+  moodToday: number | null;
   createdAt: string;
   respondedAt: string | null;
   rawResponse: string | null;
@@ -113,18 +113,23 @@ export default function Dashboard() {
           hour: "2-digit",
           minute: "2-digit",
         }),
-        mood: entry.mood,
-        timeOfDay: entry.timeOfDay,
+        moodYesterday: entry.moodYesterday,
+        moodToday: entry.moodToday,
         founder: entry.founder.name,
-        label: getMoodLabel(entry.mood as any),
+        labelYesterday:
+          entry.moodYesterday !== null ? getMoodLabel(entry.moodYesterday as any) : "N/A",
+        labelToday: entry.moodToday !== null ? getMoodLabel(entry.moodToday as any) : "N/A",
       }));
   };
 
+  // Calculate average mood from both yesterday and today
+  const allMoods = moodData
+    .filter((e) => e.respondedAt)
+    .flatMap((e) => [e.moodYesterday, e.moodToday])
+    .filter((m): m is number => m !== null);
+
   const averageMoodNum =
-    moodData.filter((e) => e.respondedAt).length > 0
-      ? moodData.filter((e) => e.respondedAt).reduce((sum, e) => sum + e.mood, 0) /
-        moodData.filter((e) => e.respondedAt).length
-      : 0;
+    allMoods.length > 0 ? allMoods.reduce((sum, mood) => sum + mood, 0) / allMoods.length : 0;
 
   const averageMoodLabel =
     averageMoodNum > 0 ? getMoodLabel(Math.round(averageMoodNum) as any) : "N/A";
@@ -237,24 +242,46 @@ export default function Dashboard() {
                             <div className="bg-white p-4 rounded-lg shadow-lg border">
                               <p className="font-semibold">{data.founder}</p>
                               <p className="text-sm text-gray-600">{data.date}</p>
-                              <p className="text-sm">Time: {data.timeOfDay}</p>
-                              <p className="font-bold" style={{ color: getMoodColor(data.mood) }}>
-                                Mood: {data.label}
-                              </p>
+                              {data.moodYesterday !== null && (
+                                <p
+                                  className="text-sm"
+                                  style={{ color: getMoodColor(data.moodYesterday) }}
+                                >
+                                  Yesterday: {data.labelYesterday}
+                                </p>
+                              )}
+                              {data.moodToday !== null && (
+                                <p
+                                  className="text-sm"
+                                  style={{ color: getMoodColor(data.moodToday) }}
+                                >
+                                  Today: {data.labelToday}
+                                </p>
+                              )}
                             </div>
                           );
                         }
                         return null;
                       }}
                     />
-                    <Legend formatter={(value) => "Mood"} />
+                    <Legend />
                     <Line
                       type="monotone"
-                      dataKey="mood"
+                      dataKey="moodYesterday"
+                      stroke="#8b5cf6"
+                      strokeWidth={2}
+                      dot={{ r: 6 }}
+                      name="Yesterday"
+                      connectNulls
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="moodToday"
                       stroke="#4f46e5"
                       strokeWidth={2}
                       dot={{ r: 6 }}
-                      name="Mood"
+                      name="Today"
+                      connectNulls
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -280,19 +307,31 @@ export default function Dashboard() {
                       <div>
                         <p className="font-medium text-gray-800">{entry.founder.name}</p>
                         <p className="text-sm text-gray-600">
-                          {new Date(entry.createdAt).toLocaleString("es-ES")} - {entry.timeOfDay}
+                          {new Date(entry.createdAt).toLocaleString("es-ES")}
                         </p>
                       </div>
                       <div className="text-right">
                         {entry.respondedAt ? (
                           <>
-                            <p
-                              className="font-bold"
-                              style={{ color: getMoodColor(entry.mood as any) }}
-                            >
-                              {getMoodLabel(entry.mood as any)}
-                            </p>
-                            <p className="text-sm text-gray-600">Click to view reply</p>
+                            <div className="space-y-1">
+                              {entry.moodYesterday !== null && (
+                                <p
+                                  className="text-sm font-semibold"
+                                  style={{ color: getMoodColor(entry.moodYesterday as any) }}
+                                >
+                                  Yesterday: {getMoodLabel(entry.moodYesterday as any)}
+                                </p>
+                              )}
+                              {entry.moodToday !== null && (
+                                <p
+                                  className="text-sm font-semibold"
+                                  style={{ color: getMoodColor(entry.moodToday as any) }}
+                                >
+                                  Today: {getMoodLabel(entry.moodToday as any)}
+                                </p>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-600 mt-1">Click to view reply</p>
                           </>
                         ) : (
                           <p className="text-sm text-gray-500">Pending response</p>
@@ -323,8 +362,7 @@ export default function Dashboard() {
                   {selectedEntry.founder.name}&apos;s Response
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {new Date(selectedEntry.createdAt).toLocaleString("es-ES")} -{" "}
-                  {selectedEntry.timeOfDay}
+                  {new Date(selectedEntry.createdAt).toLocaleString("es-ES")}
                 </p>
               </div>
               <button
@@ -334,13 +372,23 @@ export default function Dashboard() {
                 ×
               </button>
             </div>
-            <div className="mb-4">
-              <p
-                className="text-lg font-bold mb-2"
-                style={{ color: getMoodColor(selectedEntry.mood as any) }}
-              >
-                Mood: {getMoodLabel(selectedEntry.mood as any)}
-              </p>
+            <div className="mb-4 space-y-2">
+              {selectedEntry.moodYesterday !== null && (
+                <p
+                  className="text-lg font-bold"
+                  style={{ color: getMoodColor(selectedEntry.moodYesterday as any) }}
+                >
+                  Yesterday: {getMoodLabel(selectedEntry.moodYesterday as any)}
+                </p>
+              )}
+              {selectedEntry.moodToday !== null && (
+                <p
+                  className="text-lg font-bold"
+                  style={{ color: getMoodColor(selectedEntry.moodToday as any) }}
+                >
+                  Today: {getMoodLabel(selectedEntry.moodToday as any)}
+                </p>
+              )}
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-sm text-gray-600 mb-2">Email Reply:</p>
